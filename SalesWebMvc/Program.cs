@@ -3,7 +3,16 @@ using Microsoft.Extensions.DependencyInjection;
 using SalesWebMvc.Data;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SalesWebMvcContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("SalesWebMvcContext") ?? throw new InvalidOperationException("Connection string 'SalesWebMvcContext' not found.")));
+{
+    var configuration = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json")
+        .Build();
+
+    var connectionString = configuration.GetConnectionString("SalesWebMvcContext");
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+});
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
